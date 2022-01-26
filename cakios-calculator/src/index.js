@@ -6,13 +6,17 @@ class Calculator extends React.Component {
 		super(props);
 			// Bindando this:
 			this.handleNumericButtons = this.handleNumericButtons.bind(this);
-			this.handleMathButtons = this.handleMathButtons.bind(this);
+			this.handlePlusButton = this.handlePlusButton.bind(this);
+			this.handleMinusButton = this.handleMinusButton.bind(this);
+			this.handleTimesButton = this.handleTimesButton.bind(this);
+			this.handleDividedButton = this.handleDividedButton.bind(this);
 			this.handleEqualButton = this.handleEqualButton.bind(this);
 			this.handleACButton = this.handleACButton.bind(this);
 			// States:
 			this.state = {
 				showingInScreen: " ",
-				outOfScreen: 0,
+				offScreen: "0",
+				rememberLastOperation: " ",
 			}
 		}
 	// Cuida dos botões número:
@@ -20,54 +24,91 @@ class Calculator extends React.Component {
 		const newResponse = this.state.showingInScreen + number;
 		this.setState({showingInScreen: newResponse})
 	}
-	// Cuida dos botões matemáticos:
-	handleMathButtons(simbol) {
-		const convertToInt = parseInt(this.state.showingInScreen);
-		const outOfScreen = this.state.outOfScreen;
-		switch (simbol) {
-			case "+":
-			console.log(convertToInt + outOfScreen);
-				this.setState({outOfScreen: convertToInt + outOfScreen});
-			break;
-			case "-":
-				console.log(convertToInt - outOfScreen);
-				this.setState({outOfScreen: outOfScreen - convertToInt});
-			break;
-			case "*":
-				if(outOfScreen === 0) {
-					// Caso a multiplicação seja 0 * convertToInt:
-					console.log(convertToInt * 1);
-					this.setState({outOfScreen: convertToInt * 1});
-				}else {
-					console.log(convertToInt * outOfScreen);
-					this.setState({outOfScreen: convertToInt * outOfScreen});
-				}
-			break;
-			case "/":
-				console.log(convertToInt / outOfScreen);
-				this.setState({outOfScreen: outOfScreen / convertToInt});
-			break;
-
+	// Executa a soma:
+	handlePlusButton() {
+		this.setState({rememberLastOperation: "+"});
+		this.setState({offScreen: parseInt(this.state.showingInScreen) + parseInt(this.state.offScreen)});
+		this.setState({showingInScreen: " "});
+	}
+	// Executa a subtração:
+	handleMinusButton() {
+		this.setState({rememberLastOperation: "-"});
+		if(this.state.offScreen === "0") {
+			this.setState({offScreen: parseInt(this.state.showingInScreen)});
+		}else {
+			this.setState({offScreen: parseInt(this.state.offScreen) - parseInt(this.state.showingInScreen)});
 		}
-		this.setState({showingInScreen: " "})
+		this.setState({showingInScreen: " "});
+	}
+	// Executa a multiplicação:
+	handleTimesButton() {
+		this.setState({rememberLastOperation: "*"});
+		// Caso haja multiplicação por 0:
+		if(this.state.offScreen === "0") {
+			this.setState({offScreen: parseInt(this.state.showingInScreen)});
+		}else {
+			this.setState({offScreen: parseInt(this.state.showingInScreen) * parseInt(this.state.offScreen)});
+		}
+		this.setState({showingInScreen: " "});
+	}
+	// Executa a divisão:
+	handleDividedButton() {
+		this.setState({rememberLastOperation: "/"});
+		// Caso haja multiplicação por 0:
+		if(this.state.offScreen === "0") {
+			this.setState({offScreen: parseInt(this.state.showingInScreen)});
+		}else {
+			this.setState({offScreen: parseInt(this.state.offScreen) / parseInt(this.state.showingInScreen)});
+		}
+		this.setState({showingInScreen: " "});
 	}
 	// Cuida do botão equal =:
 	handleEqualButton() {
-		this.setState({showingInScreen: this.state.outOfScreen});
+		console.log(this.state.rememberLastOperation);
+		console.log(this.state.showingInScreen);
+		console.log(this.state.offScreen);
+		const showingInScreenInt = parseInt(this.state.showingInScreen);
+		// Caso showingInScreen não tenha sido definido
+		if(this.state.showingInScreen === " ") {
+			this.setState({showingInScreen: this.state.offScreen});
+		}else {
+			switch (this.state.rememberLastOperation) {
+				case "+":
+					this.setState({showingInScreen: this.state.offScreen + showingInScreenInt});
+					this.setState({offScreen: 0});
+					break;
+				case "-":
+					this.setState({showingInScreen: this.state.offScreen - showingInScreenInt});
+					this.setState({offScreen: 0});
+					break;
+				case "*":
+					this.setState({showingInScreen: this.state.offScreen * showingInScreenInt});
+					this.setState({offScreen: 0});
+					break;
+				case "/":
+					this.setState({showingInScreen: this.state.offScreen / showingInScreenInt});
+					this.setState({offScreen: 0});
+					break;
+				default:
+					console.log("sorry something goes wrong !!!");
+			}
+		}		
 	}
 	// Cuida do botão AC:
 	handleACButton() {
 		this.setState({showingInScreen: " "});
-		this.setState({outOfScreen: 0});
+		this.setState({offScreen: "0"});
 	}
 	render() {
 		return(
 			<div className = "allScreen">
+
 				{/* Bordas */}
 				<div className = "screenBorder">
 				</div>
 				<div className = "calculatorBorder">
 				</div>
+
 					{/* Tela de resposta */}
 					<div className = "responseScreen">
 						<ResponseScreen content={this.state.showingInScreen}/>
@@ -79,20 +120,12 @@ class Calculator extends React.Component {
 						</button>
 					</div>
 					{/* Butões de calculo + - x / */}
-					<div className = "allMathButtons">
-						<button className = "mathButtons" onClick = {() => this.handleMathButtons("+")}>
-							+
-						</button><br/>
-						<button className = "mathButtons" onClick = {() => this.handleMathButtons("-")}>
-							-
-						</button><br/>
-						<button className = "mathButtons" onClick = {() => this.handleMathButtons("*")}>
-							x
-						</button><br/>
-						<button className = "mathButtons" onClick = {() => this.handleMathButtons("/")}>
-							/
-						</button>
-					</div>
+					<MathButtons
+					handlePlus = {this.handlePlusButton}
+					handleMinus = {this.handleMinusButton}
+					handleTimes = {this.handleTimesButton}
+					handleDivided = {this.handleDividedButton}
+					/>
 					<div className = "allNumericButtons">
 						{/* Butões númericos de 0 a 9 */}
 						<button className = "numericButtons" onClick = {() => this.handleNumericButtons("9")}>
@@ -126,7 +159,7 @@ class Calculator extends React.Component {
 							0
 						</button>
 						{/* Botão de igual = */}
-						<button className = "numericButtons" onClick = {() => this.handleEqualButton()}>
+						<button className = "numericButtons" onClick = {this.handleEqualButton}>
 							=
 						</button>
 					</div>
@@ -140,6 +173,27 @@ class ResponseScreen extends React.Component {
 		const screenContent = this.props.content
 		return(
 			<h1>{screenContent}</h1>
+		)
+	}
+}
+
+class MathButtons extends React.Component {
+	render() {
+		return(
+			<div className = "allMathButtons">
+				<button className = "mathButtons" onClick = {this.props.handlePlus}>
+					+
+				</button><br/>
+				<button className = "mathButtons" onClick = {this.props.handleMinus}>
+					-
+				</button><br/>
+				<button className = "mathButtons" onClick = {this.props.handleTimes}>
+					x
+				</button><br/>
+				<button className = "mathButtons" onClick = {this.props.handleDivided}>
+					/
+				</button>
+			</div>
 		)
 	}
 }
