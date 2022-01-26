@@ -1,0 +1,39 @@
+.screenBorder {
+	position: absolute;
+	border: 3px;
+	border-style: solid;
+	margin: 35px 0px 0px 510px;
+	padding: 0px 0px 45px 175px;
+	border-radius: 10px;
+}
+.calculatorBorder {
+	position: absolute;
+	border: 6px;
+	border-style: double;
+	margin: 20px 0px 0px 496px;
+	padding: 0px 0px 280px 196px;
+	border-radius: 20px;
+}
+.allNumericButtons {
+	position: absolute;
+	margin: 130px 0px 0px 540px;
+}
+.numericButtons {
+	font-size: 25px;
+}
+.ACButton {
+	position: absolute;
+	margin: 102px 0px 0px 540px;
+	font-size: 20px;
+}
+.allMathButtons {
+	position: absolute;
+	margin: 130px 0px 0px 630px;
+}
+.mathButtons {
+	font-size: 25px;
+}
+.responseScreen {
+	position: absolute;
+	margin: 20px 0px 0px 520px;
+}
